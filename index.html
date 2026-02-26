@@ -15,24 +15,24 @@
         h1 { color: white; text-align: center; margin-bottom: 1rem; letter-spacing: 0.3em; }
         h2 { color: #666; font-size: 0.8rem; margin: 1rem 0 0.5rem; text-transform: uppercase; }
         
-        .card-row { display: flex; flex-wrap: wrap; gap: 3px; margin-bottom: 0.5rem; }
+        .card-row { display: flex; flex-wrap: wrap; gap: 2px; margin-bottom: 0.5rem; }
         
         .card {
-            width: 42px;
-            height: 63px;
-            border-radius: 4px;
+            width: 56px;
+            height: 40px;
+            border-radius: 3px;
             overflow: hidden;
-            box-shadow: 1px 1px 4px rgba(0,0,0,0.5);
+            box-shadow: 1px 1px 3px rgba(0,0,0,0.5);
             transition: transform 0.15s;
             cursor: pointer;
-            background: url('https://raw.githubusercontent.com/eperezcosano/Uno/master/public/images/deck.svg') no-repeat;
-            background-size: 840px 720px;
+            background: url('https://raw.githubusercontent.com/abhisheks008/UNO/main/head.png') no-repeat;
+            background-size: 788px 716px;
         }
-        .card:hover { transform: scale(1.6) translateY(-12px); z-index: 100; }
+        .card:hover { transform: scale(1.6) translateY(-8px); z-index: 100; }
         
         .card-back {
-            background: url('https://raw.githubusercontent.com/eperezcosano/Uno/master/public/images/uno.svg') center/cover !important;
-            background-size: 36px 54px;
+            background: url('https://raw.githubusercontent.com/abhisheks008/UNO/main/images/uno!.png') center/cover !important;
+            background-size: 56px 40px !important;
         }
     </style>
 </head>
@@ -41,14 +41,19 @@
     <div id="app"></div>
 
     <script>
-        // Smaller sprite: 840 x 720 (14 * 60, 8 * 90)
-        const CARD_W = 60, CARD_H = 90;
+        // PNG sprite: 1576 x 895 (14 cols x 8 rows)
+        const CARD_W = 1576 / 14;  // ~112.57
+        const CARD_H = 895 / 8;     // ~111.875
+        
+        // Display size (scaled down)
+        const DISP_W = 56, DISP_H = 40;
+        
         const COLORS = ['red', 'yellow', 'green', 'blue'];
         const values = ['0','1','2','3','4','5','6','7','8','9','skip','reverse','draw2'];
         
         const cardData = [];
         
-        // Color cards: 8 rows, 13 cols each (0-9, skip, reverse, draw2)
+        // Color cards: rows 0-3 and 4-7 (8 rows, 13 cols each)
         for (let row = 0; row < 8; row++) {
             const color = COLORS[row % 4];
             for (let col = 0; col < 13; col++) {
@@ -61,12 +66,12 @@
             }
         }
         
-        // 4 Wild (color change) - at row 4, col 13
+        // Wild (color change): row 4, col 13
         for (let i = 0; i < 4; i++) {
             cardData.push({ color: 'wild', value: 'wild', x: 13 * CARD_W, y: 4 * CARD_H });
         }
         
-        // 4 Wild +4 - at row 7, col 13  
+        // Wild +4: row 7, col 13
         for (let i = 0; i < 4; i++) {
             cardData.push({ color: 'wild4', value: 'wild4', x: 13 * CARD_W, y: 7 * CARD_H });
         }
@@ -79,20 +84,20 @@
                 const cards = cardData.filter(c => c.color === color);
                 html += `<h2>${color}</h2><div class="card-row">`;
                 cards.forEach(c => {
-                    html += `<div class="card" style="background-position: -${c.x}px -${c.y}px" title="${c.color} ${c.value}"></div>`;
+                    html += `<div class="card" style="background-position: -${Math.round(c.x * 0.5)}px -${Math.round(c.y * 0.5)}px" title="${c.color} ${c.value}"></div>`;
                 });
                 html += `</div>`;
             });
             
             html += `<h2>Wild (Color Change) - 4</h2><div class="card-row">`;
             cardData.filter(c => c.color === 'wild').forEach(c => {
-                html += `<div class="card" style="background-position: -${c.x}px -${c.y}px" title="Wild - Change Color"></div>`;
+                html += `<div class="card" style="background-position: -${Math.round(c.x * 0.5)}px -${Math.round(c.y * 0.5)}px" title="Wild - Change Color"></div>`;
             });
             html += `</div>`;
             
             html += `<h2>Wild Draw 4 - 4</h2><div class="card-row">`;
             cardData.filter(c => c.color === 'wild4').forEach(c => {
-                html += `<div class="card" style="background-position: -${c.x}px -${c.y}px" title="Wild Draw 4"></div>`;
+                html += `<div class="card" style="background-position: -${Math.round(c.x * 0.5)}px -${Math.round(c.y * 0.5)}px" title="Wild Draw 4"></div>`;
             });
             html += `</div>`;
             
