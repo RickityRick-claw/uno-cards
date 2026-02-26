@@ -5,164 +5,220 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🃏 Uno Cards</title>
     <style>
-        * { box-sizing: border-box; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            background: #0d0d0d;
             min-height: 100vh;
-            padding: 1rem;
-            font-family: system-ui, sans-serif;
+            padding: 2rem;
+            font-family: 'Segoe UI', system-ui, sans-serif;
         }
-        h1 { color: white; text-align: center; margin: 0.5rem 0; }
-        h2 { color: #888; margin: 1rem 0 0.5rem; font-size: 1rem; }
-        .card-row { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; }
+        h1 { 
+            color: white; 
+            text-align: center; 
+            margin-bottom: 2rem;
+            font-size: 2.5rem;
+            letter-spacing: 0.3em;
+        }
         
-        /* CARD STYLES */
+        .card-row { margin-bottom: 2rem; }
+        .card-row h2 {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+        }
+        .cards { display: flex; flex-wrap: wrap; gap: 6px; }
+        
         .card {
-            width: 50px;
-            height: 75px;
-            border-radius: 6px;
+            width: 48px;
+            height: 72px;
+            border-radius: 5px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            padding: 3px;
-            box-shadow: 1px 1px 4px rgba(0,0,0,0.5);
-            font-family: Arial Black, sans-serif;
+            padding: 4px;
+            box-shadow: 2px 2px 6px rgba(0,0,0,0.4);
+            cursor: pointer;
+            transition: transform 0.15s, z-index 0s;
             position: relative;
-            flex-shrink: 0;
+            z-index: 1;
         }
-        .card-top, .card-bottom {
+        .card:hover {
+            transform: scale(1.4) translateY(-15px);
+            z-index: 100;
+        }
+        
+        .card-face {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        
+        .card-corner {
             font-size: 10px;
-            font-weight: bold;
-            color: white;
-            text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+            font-weight: 800;
+            line-height: 1;
         }
-        .card-bottom { transform: rotate(180deg); }
+        .card-corner.bottom { transform: rotate(180deg); }
+        
         .card-center {
-            font-size: 18px;
-            text-align: center;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 800;
+        }
+        
+        /* Colors */
+        .card.red { 
+            background: linear-gradient(145deg, #ff3344, #cc0000); 
             color: white;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.6);
+            border: 1.5px solid #aa0000;
+        }
+        .card.yellow { 
+            background: linear-gradient(145deg, #ffcc00, #ff9900); 
+            color: #442200;
+            border: 1.5px solid #cc7700;
+        }
+        .card.green { 
+            background: linear-gradient(145deg, #00cc66, #009944); 
+            color: white;
+            border: 1.5px solid #007733;
+        }
+        .card.blue { 
+            background: linear-gradient(145deg, #3388ff, #1155cc); 
+            color: white;
+            border: 1.5px solid #004499;
+        }
+        .card.wild { 
+            background: linear-gradient(135deg, #ff00cc, #6600ff, #00ccff, #00ff66);
+            color: white;
+            border: 1.5px solid white;
+            text-shadow: 0 0 3px rgba(0,0,0,0.8);
         }
         
-        /* COLORS */
-        .red { background: linear-gradient(135deg, #e63946, #c1121f); border: 2px solid #9d0208; }
-        .yellow { background: linear-gradient(135deg, #f4a261, #e76f51); border: 2px solid #d00000; }
-        .green { background: linear-gradient(135deg, #2a9d8f, #1a936f); border: 2px solid #006d77; }
-        .blue { background: linear-gradient(135deg, #457b9d, #1d3557); border: 2px solid #023e8a; }
-        .wild { 
-            background: linear-gradient(135deg, #ff006e, #8338ec, #3a86ff, #06d6a0);
-            border: 2px solid white;
-        }
-        
-        /* SPECIAL SYMBOLS */
-        .skip .card-center::after { content: '⊘'; }
-        .reverse .card-center::after { content: '⇄'; font-size: 14px; }
-        .draw2 .card-center::after { content: '+2'; font-size: 12px; }
-        .draw4 .card-center::after { content: '+4'; font-size: 12px; }
-        .wild-card .card-center::after { content: '🌈'; font-size: 16px; }
-        
-        /* CARD BACK */
+        /* Card back */
         .card-back {
-            background: linear-gradient(135deg, #1a1a2e, #0f3460);
-            border: 2px solid #e94560;
+            background: linear-gradient(145deg, #1a1a2e, #0f0f1a);
+            border: 2px solid #ff3344;
             display: flex;
             align-items: center;
             justify-content: center;
         }
-        .card-back .card-center {
-            color: #e94560;
-            font-family: Arial Black, sans-serif;
+        .card-back .logo {
             font-size: 10px;
+            font-weight: 900;
+            color: #ff3344;
             letter-spacing: 1px;
         }
+        
+        /* Special cards */
+        .card[data-value="skip"] .card-center::after { content: '⊘'; }
+        .card[data-value="reverse"] .card-center::after { content: '⟲'; font-size: 18px; }
+        .card[data-value="draw2"] .card-center::after { content: '+2'; font-size: 14px; }
+        .card[data-value="wild"] .card-center::after { content: '🌈'; }
+        .card[data-value="wild4"] .card-center::after { content: '+4'; font-size: 14px; }
+        
+        /* Dark text for yellow */
+        .card.yellow .card-center,
+        .card.yellow .card-corner { color: #442200; text-shadow: none; }
     </style>
 </head>
 <body>
-    <h1>🃏 UNO</h1>
-    
-    <h2>Card Back</h2>
-    <div class="card-row">
-        <div class="card card-back"><span class="card-center">UNO</span></div>
-    </div>
-    
-    <h2>Red</h2>
-    <div class="card-row">
-        <div class="card red"><span class="card-top">0</span><span class="card-center">0</span><span class="card-bottom">0</span></div>
-        <div class="card red"><span class="card-top">1</span><span class="card-center">1</span><span class="card-bottom">1</span></div>
-        <div class="card red"><span class="card-top">2</span><span class="card-center">2</span><span class="card-bottom">2</span></div>
-        <div class="card red"><span class="card-top">3</span><span class="card-center">3</span><span class="card-bottom">3</span></div>
-        <div class="card red"><span class="card-top">4</span><span class="card-center">4</span><span class="card-bottom">4</span></div>
-        <div class="card red"><span class="card-top">5</span><span class="card-center">5</span><span class="card-bottom">5</span></div>
-        <div class="card red"><span class="card-top">6</span><span class="card-center">6</span><span class="card-bottom">6</span></div>
-        <div class="card red"><span class="card-top">7</span><span class="card-center">7</span><span class="card-bottom">7</span></div>
-        <div class="card red"><span class="card-top">8</span><span class="card-center">8</span><span class="card-bottom">8</span></div>
-        <div class="card red"><span class="card-top">9</span><span class="card-center">9</span><span class="card-bottom">9</span></div>
-        <div class="card red skip"><span class="card-top">⊘</span><span class="card-center"></span><span class="card-bottom">⊘</span></div>
-        <div class="card red reverse"><span class="card-top">⇄</span><span class="card-center"></span><span class="card-bottom">⇄</span></div>
-        <div class="card red draw2"><span class="card-top">+2</span><span class="card-center"></span><span class="card-bottom">+2</span></div>
-    </div>
-    
-    <h2>Yellow</h2>
-    <div class="card-row">
-        <div class="card yellow"><span class="card-top">0</span><span class="card-center">0</span><span class="card-bottom">0</span></div>
-        <div class="card yellow"><span class="card-top">1</span><span class="card-center">1</span><span class="card-bottom">1</span></div>
-        <div class="card yellow"><span class="card-top">2</span><span class="card-center">2</span><span class="card-bottom">2</span></div>
-        <div class="card yellow"><span class="card-top">3</span><span class="card-center">3</span><span class="card-bottom">3</span></div>
-        <div class="card yellow"><span class="card-top">4</span><span class="card-center">4</span><span class="card-bottom">4</span></div>
-        <div class="card yellow"><span class="card-top">5</span><span class="card-center">5</span><span class="card-bottom">5</span></div>
-        <div class="card yellow"><span class="card-top">6</span><span class="card-center">6</span><span class="card-bottom">6</span></div>
-        <div class="card yellow"><span class="card-top">7</span><span class="card-center">7</span><span class="card-bottom">7</span></div>
-        <div class="card yellow"><span class="card-top">8</span><span class="card-center">8</span><span class="card-bottom">8</span></div>
-        <div class="card yellow"><span class="card-top">9</span><span class="card-center">9</span><span class="card-bottom">9</span></div>
-        <div class="card yellow skip"><span class="card-top">⊘</span><span class="card-center"></span><span class="card-bottom">⊘</span></div>
-        <div class="card yellow reverse"><span class="card-top">⇄</span><span class="card-center"></span><span class="card-bottom">⇄</span></div>
-        <div class="card yellow draw2"><span class="card-top">+2</span><span class="card-center"></span><span class="card-bottom">+2</span></div>
-    </div>
-    
-    <h2>Green</h2>
-    <div class="card-row">
-        <div class="card green"><span class="card-top">0</span><span class="card-center">0</span><span class="card-bottom">0</span></div>
-        <div class="card green"><span class="card-top">1</span><span class="card-center">1</span><span class="card-bottom">1</span></div>
-        <div class="card green"><span class="card-top">2</span><span class="card-center">2</span><span class="card-bottom">2</span></div>
-        <div class="card green"><span class="card-top">3</span><span class="card-center">3</span><span class="card-bottom">3</span></div>
-        <div class="card green"><span class="card-top">4</span><span class="card-center">4</span><span class="card-bottom">4</span></div>
-        <div class="card green"><span class="card-top">5</span><span class="card-center">5</span><span class="card-bottom">5</span></div>
-        <div class="card green"><span class="card-top">6</span><span class="card-center">6</span><span class="card-bottom">6</span></div>
-        <div class="card green"><span class="card-top">7</span><span class="card-center">7</span><span class="card-bottom">7</span></div>
-        <div class="card green"><span class="card-top">8</span><span class="card-center">8</span><span class="card-bottom">8</span></div>
-        <div class="card green"><span class="card-top">9</span><span class="card-center">9</span><span class="card-bottom">9</span></div>
-        <div class="card green skip"><span class="card-top">⊘</span><span class="card-center"></span><span class="card-bottom">⊘</span></div>
-        <div class="card green reverse"><span class="card-top">⇄</span><span class="card-center"></span><span class="card-bottom">⇄</span></div>
-        <div class="card green draw2"><span class="card-top">+2</span><span class="card-center"></span><span class="card-bottom">+2</span></div>
-    </div>
-    
-    <h2>Blue</h2>
-    <div class="card-row">
-        <div class="card blue"><span class="card-top">0</span><span class="card-center">0</span><span class="card-bottom">0</span></div>
-        <div class="card blue"><span class="card-top">1</span><span class="card-center">1</span><span class="card-bottom">1</span></div>
-        <div class="card blue"><span class="card-top">2</span><span class="card-center">2</span><span class="card-bottom">2</span></div>
-        <div class="card blue"><span class="card-top">3</span><span class="card-center">3</span><span class="card-bottom">3</span></div>
-        <div class="card blue"><span class="card-top">4</span><span class="card-center">4</span><span class="card-bottom">4</span></div>
-        <div class="card blue"><span class="card-top">5</span><span class="card-center">5</span><span class="card-bottom">5</span></div>
-        <div class="card blue"><span class="card-top">6</span><span class="card-center">6</span><span class="card-bottom">6</span></div>
-        <div class="card blue"><span class="card-top">7</span><span class="card-center">7</span><span class="card-bottom">7</span></div>
-        <div class="card blue"><span class="card-top">8</span><span class="card-center">8</span><span class="card-bottom">8</span></div>
-        <div class="card blue"><span class="card-top">9</span><span class="card-center">9</span><span class="card-bottom">9</span></div>
-        <div class="card blue skip"><span class="card-top">⊘</span><span class="card-center"></span><span class="card-bottom">⊘</span></div>
-        <div class="card blue reverse"><span class="card-top">⇄</span><span class="card-center"></span><span class="card-bottom">⇄</span></div>
-        <div class="card blue draw2"><span class="card-top">+2</span><span class="card-center"></span><span class="card-bottom">+2</span></div>
-    </div>
-    
-    <h2>Wild</h2>
-    <div class="card-row">
-        <div class="card wild wild-card"><span class="card-top">🌈</span><span class="card-center"></span><span class="card-bottom">🌈</span></div>
-        <div class="card wild wild-card"><span class="card-top">🌈</span><span class="card-center"></span><span class="card-bottom">🌈</span></div>
-        <div class="card wild wild-card"><span class="card-top">🌈</span><span class="card-center"></span><span class="card-bottom">🌈</span></div>
-        <div class="card wild wild-card"><span class="card-top">🌈</span><span class="card-center"></span><span class="card-bottom">🌈</span></div>
-        <div class="card wild draw4"><span class="card-top">+4</span><span class="card-center"></span><span class="card-bottom">+4</span></div>
-        <div class="card wild draw4"><span class="card-top">+4</span><span class="card-center"></span><span class="card-bottom">+4</span></div>
-        <div class="card wild draw4"><span class="card-top">+4</span><span class="card-center"></span><span class="card-bottom">+4</span></div>
-        <div class="card wild draw4"><span class="card-top">+4</span><span class="card-center"></span><span class="card-bottom">+4</span></div>
-    </div>
+    <h1>UNO</h1>
+    <div id="app"></div>
+
+    <script>
+        const COLORS = ['red', 'yellow', 'green', 'blue'];
+        
+        // Build deck: 1x0, 2x(1-9), 2x(special) per color + 4 wild + 4 wild4
+        function buildDeck() {
+            const deck = [];
+            let id = 0;
+            
+            COLORS.forEach(color => {
+                deck.push({ id: id++, color, value: '0' });
+                for (let v = 1; v <= 9; v++) {
+                    deck.push({ id: id++, color, value: String(v) });
+                    deck.push({ id: id++, color, value: String(v) });
+                }
+                ['skip', 'reverse', 'draw2'].forEach(v => {
+                    deck.push({ id: id++, color, value: v });
+                    deck.push({ id: id++, color, value: v });
+                });
+            });
+            
+            for (let i = 0; i < 4; i++) deck.push({ id: id++, color: 'wild', value: 'wild' });
+            for (let i = 0; i < 4; i++) deck.push({ id: id++, color: 'wild', value: 'wild4' });
+            
+            return deck;
+        }
+        
+        function renderCard(card) {
+            const div = document.createElement('div');
+            div.className = `card ${card.color}`;
+            div.dataset.value = card.value;
+            
+            const display = card.value === 'wild' ? '🌈' : card.value === 'wild4' ? '+4' : card.value;
+            const cornerDisplay = ['skip','reverse','draw2'].includes(card.value) 
+                ? (card.value === 'skip' ? '⊘' : card.value === 'reverse' ? '⟲' : '+2')
+                : display;
+            
+            div.innerHTML = `
+                <div class="card-face">
+                    <div class="card-corner">${cornerDisplay}</div>
+                    <div class="card-center"></div>
+                    <div class="card-corner bottom">${cornerDisplay}</div>
+                </div>
+            `;
+            return div;
+        }
+        
+        function render() {
+            const deck = buildDeck();
+            const app = document.getElementById('app');
+            
+            // Card back
+            let html = `<div class="card-row"><h2>Back</h2><div class="cards"><div class="card card-back"><div class="logo">UNO</div></div></div></div>`;
+            
+            // By color
+            COLORS.forEach(color => {
+                const cards = deck.filter(c => c.color === color);
+                html += `<div class="card-row"><h2>${color}</h2><div class="cards">`;
+                cards.forEach(c => {
+                    const display = c.value === 'skip' ? '⊘' : c.value === 'reverse' ? '⟲' : c.value === 'draw2' ? '+2' : c.value;
+                    html += `<div class="card ${c.color}" data-value="${c.value}">
+                        <div class="card-face">
+                            <div class="card-corner">${display}</div>
+                            <div class="card-center"></div>
+                            <div class="card-corner bottom">${display}</div>
+                        </div>
+                    </div>`;
+                });
+                html += `</div></div>`;
+            });
+            
+            // Wild
+            const wilds = deck.filter(c => c.color === 'wild');
+            html += `<div class="card-row"><h2>Wild</h2><div class="cards">`;
+            wilds.forEach(c => {
+                const display = c.value === 'wild' ? '🌈' : '+4';
+                html += `<div class="card ${c.color}" data-value="${c.value}">
+                    <div class="card-face">
+                        <div class="card-corner">${display}</div>
+                        <div class="card-center"></div>
+                        <div class="card-corner bottom">${display}</div>
+                    </div>
+                </div>`;
+            });
+            html += `</div></div>`;
+            
+            app.innerHTML = html;
+        }
+        
+        render();
+    </script>
 </body>
 </html>
