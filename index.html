@@ -38,7 +38,7 @@
         const BASE = 'https://raw.githubusercontent.com/abhisheks008/UNO/main/images/';
         
         const COLORS = ['red', 'yellow', 'green', 'blue'];
-        // 0-9 (10 cards), 10=skip, 11=reverse, 12=draw2
+        // 0-9 (10 cards), 10=reverse, 11=skip, 12=draw2
         const cardData = [];
         
         COLORS.forEach(color => {
@@ -53,13 +53,15 @@
         
         function render() {
             const app = document.getElementById('app');
-            let html = `<h2>Back</h2><div class="card-row"><div class="card" style="background-image: url('${BASE}uno!.png')"></div></div>`;
+            // back.png is the correct card back
+            let html = `<h2>Back</h2><div class="card-row"><div class="card" style="background-image: url('${BASE}back.png')"></div></div>`;
             
             COLORS.forEach(color => {
                 const cards = cardData.filter(c => c.color === color);
                 html += `<h2>${color}</h2><div class="card-row">`;
                 cards.forEach(c => {
-                    html += `<div class="card" style="background-image: url('${BASE}${c.file}')" title="${c.color} ${c.value}"></div>`;
+                    const label = c.value === 10 ? 'reverse' : c.value === 11 ? 'skip' : c.value === 12 ? 'draw2' : c.value;
+                    html += `<div class="card" style="background-image: url('${BASE}${c.file}')" title="${c.color} ${label}"></div>`;
                 });
                 html += `</div>`;
             });
