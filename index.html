@@ -18,21 +18,21 @@
         .card-row { display: flex; flex-wrap: wrap; gap: 3px; margin-bottom: 0.5rem; }
         
         .card {
-            width: 48px;
-            height: 72px;
+            width: 42px;
+            height: 63px;
             border-radius: 4px;
             overflow: hidden;
             box-shadow: 1px 1px 4px rgba(0,0,0,0.5);
             transition: transform 0.15s;
             cursor: pointer;
             background: url('https://raw.githubusercontent.com/eperezcosano/Uno/master/public/images/deck.svg') no-repeat;
-            background-size: 3362px 2882px;
+            background-size: 840px 720px;
         }
-        .card:hover { transform: scale(1.5) translateY(-10px); z-index: 100; }
+        .card:hover { transform: scale(1.6) translateY(-12px); z-index: 100; }
         
         .card-back {
             background: url('https://raw.githubusercontent.com/eperezcosano/Uno/master/public/images/uno.svg') center/cover !important;
-            background-size: 40px 60px;
+            background-size: 36px 54px;
         }
     </style>
 </head>
@@ -41,19 +41,14 @@
     <div id="app"></div>
 
     <script>
-        // Full sprite: 3362 x 2882
-        // 14 cols x 8 rows
-        const SPRITE_W = 3362, SPRITE_H = 2882;
-        const COLS = 14, ROWS = 8;
-        const CARD_W = SPRITE_W / COLS;  // ~240
-        const CARD_H = SPRITE_H / ROWS;   // ~360
-        
+        // Smaller sprite: 840 x 720 (14 * 60, 8 * 90)
+        const CARD_W = 60, CARD_H = 90;
         const COLORS = ['red', 'yellow', 'green', 'blue'];
         const values = ['0','1','2','3','4','5','6','7','8','9','skip','reverse','draw2'];
         
         const cardData = [];
         
-        // Rows 0-3 and 4-7: color cards (13 each)
+        // Color cards: 8 rows, 13 cols each (0-9, skip, reverse, draw2)
         for (let row = 0; row < 8; row++) {
             const color = COLORS[row % 4];
             for (let col = 0; col < 13; col++) {
@@ -66,12 +61,12 @@
             }
         }
         
-        // Wild (color change): row 4, col 13 - 4 cards
+        // 4 Wild (color change) - at row 4, col 13
         for (let i = 0; i < 4; i++) {
             cardData.push({ color: 'wild', value: 'wild', x: 13 * CARD_W, y: 4 * CARD_H });
         }
         
-        // Wild +4: row 7, col 13 - 4 cards
+        // 4 Wild +4 - at row 7, col 13  
         for (let i = 0; i < 4; i++) {
             cardData.push({ color: 'wild4', value: 'wild4', x: 13 * CARD_W, y: 7 * CARD_H });
         }
@@ -84,20 +79,20 @@
                 const cards = cardData.filter(c => c.color === color);
                 html += `<h2>${color}</h2><div class="card-row">`;
                 cards.forEach(c => {
-                    html += `<div class="card" style="background-position: -${Math.round(c.x)}px -${Math.round(c.y)}px" title="${c.color} ${c.value}"></div>`;
+                    html += `<div class="card" style="background-position: -${c.x}px -${c.y}px" title="${c.color} ${c.value}"></div>`;
                 });
                 html += `</div>`;
             });
             
-            html += `<h2>Wild (Color Change)</h2><div class="card-row">`;
+            html += `<h2>Wild (Color Change) - 4</h2><div class="card-row">`;
             cardData.filter(c => c.color === 'wild').forEach(c => {
-                html += `<div class="card" style="background-position: -${Math.round(c.x)}px -${Math.round(c.y)}px" title="Wild"></div>`;
+                html += `<div class="card" style="background-position: -${c.x}px -${c.y}px" title="Wild - Change Color"></div>`;
             });
             html += `</div>`;
             
-            html += `<h2>Wild +4</h2><div class="card-row">`;
+            html += `<h2>Wild Draw 4 - 4</h2><div class="card-row">`;
             cardData.filter(c => c.color === 'wild4').forEach(c => {
-                html += `<div class="card" style="background-position: -${Math.round(c.x)}px -${Math.round(c.y)}px" title="+4"></div>`;
+                html += `<div class="card" style="background-position: -${c.x}px -${c.y}px" title="Wild Draw 4"></div>`;
             });
             html += `</div>`;
             
