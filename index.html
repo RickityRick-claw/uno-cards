@@ -18,22 +18,16 @@
         .card-row { display: flex; flex-wrap: wrap; gap: 2px; margin-bottom: 0.5rem; }
         
         .card {
-            width: 56px;
-            height: 40px;
-            border-radius: 3px;
+            width: 50px;
+            height: 75px;
+            border-radius: 4px;
             overflow: hidden;
             box-shadow: 1px 1px 3px rgba(0,0,0,0.5);
             transition: transform 0.15s;
             cursor: pointer;
-            background: url('https://raw.githubusercontent.com/abhisheks008/UNO/main/head.png') no-repeat;
-            background-size: 788px 716px;
+            background: no-repeat center/cover;
         }
-        .card:hover { transform: scale(1.6) translateY(-8px); z-index: 100; }
-        
-        .card-back {
-            background: url('https://raw.githubusercontent.com/abhisheks008/UNO/main/images/uno!.png') center/cover !important;
-            background-size: 56px 40px !important;
-        }
+        .card:hover { transform: scale(1.5) translateY(-10px); z-index: 100; }
     </style>
 </head>
 <body>
@@ -41,64 +35,41 @@
     <div id="app"></div>
 
     <script>
-        // PNG sprite: 1576 x 895 (14 cols x 8 rows)
-        const CARD_W = 1576 / 14;  // ~112.57
-        const CARD_H = 895 / 8;     // ~111.875
-        
-        // Display size (scaled down)
-        const DISP_W = 56, DISP_H = 40;
+        const BASE = 'https://raw.githubusercontent.com/abhisheks008/UNO/main/images/';
         
         const COLORS = ['red', 'yellow', 'green', 'blue'];
-        const values = ['0','1','2','3','4','5','6','7','8','9','skip','reverse','draw2'];
-        
+        // 0-9 (10 cards), 10=skip, 11=reverse, 12=draw2
         const cardData = [];
         
-        // Color cards: rows 0-3 and 4-7 (8 rows, 13 cols each)
-        for (let row = 0; row < 8; row++) {
-            const color = COLORS[row % 4];
-            for (let col = 0; col < 13; col++) {
-                cardData.push({
-                    color,
-                    value: values[col],
-                    x: col * CARD_W,
-                    y: row * CARD_H
-                });
+        COLORS.forEach(color => {
+            for (let i = 0; i <= 12; i++) {
+                cardData.push({ color, value: i, file: `${color}${i}.png` });
             }
-        }
+        });
         
-        // Wild (color change): row 4, col 13
-        for (let i = 0; i < 4; i++) {
-            cardData.push({ color: 'wild', value: 'wild', x: 13 * CARD_W, y: 4 * CARD_H });
-        }
-        
-        // Wild +4: row 7, col 13
-        for (let i = 0; i < 4; i++) {
-            cardData.push({ color: 'wild4', value: 'wild4', x: 13 * CARD_W, y: 7 * CARD_H });
-        }
+        // Wild cards
+        cardData.push({ color: 'wild', value: 13, file: 'wild13.png' }); // color change
+        cardData.push({ color: 'wild4', value: 14, file: 'wild14.png' }); // +4
         
         function render() {
             const app = document.getElementById('app');
-            let html = `<h2>Back</h2><div class="card-row"><div class="card card-back"></div></div>`;
+            let html = `<h2>Back</h2><div class="card-row"><div class="card" style="background-image: url('${BASE}uno!.png')"></div></div>`;
             
             COLORS.forEach(color => {
                 const cards = cardData.filter(c => c.color === color);
                 html += `<h2>${color}</h2><div class="card-row">`;
                 cards.forEach(c => {
-                    html += `<div class="card" style="background-position: -${Math.round(c.x * 0.5)}px -${Math.round(c.y * 0.5)}px" title="${c.color} ${c.value}"></div>`;
+                    html += `<div class="card" style="background-image: url('${BASE}${c.file}')" title="${c.color} ${c.value}"></div>`;
                 });
                 html += `</div>`;
             });
             
-            html += `<h2>Wild (Color Change) - 4</h2><div class="card-row">`;
-            cardData.filter(c => c.color === 'wild').forEach(c => {
-                html += `<div class="card" style="background-position: -${Math.round(c.x * 0.5)}px -${Math.round(c.y * 0.5)}px" title="Wild - Change Color"></div>`;
-            });
+            html += `<h2>Wild (Color Change) - wild13</h2><div class="card-row">`;
+            html += `<div class="card" style="background-image: url('${BASE}wild13.png')" title="Wild - Change Color"></div>`;
             html += `</div>`;
             
-            html += `<h2>Wild Draw 4 - 4</h2><div class="card-row">`;
-            cardData.filter(c => c.color === 'wild4').forEach(c => {
-                html += `<div class="card" style="background-position: -${Math.round(c.x * 0.5)}px -${Math.round(c.y * 0.5)}px" title="Wild Draw 4"></div>`;
-            });
+            html += `<h2>Wild Draw 4 - wild14</h2><div class="card-row">`;
+            html += `<div class="card" style="background-image: url('${BASE}wild14.png')" title="Wild Draw 4"></div>`;
             html += `</div>`;
             
             app.innerHTML = html;
