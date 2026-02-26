@@ -7,123 +7,51 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            background: #0d0d0d;
+            background: #111;
             min-height: 100vh;
-            padding: 2rem;
-            font-family: 'Segoe UI', system-ui, sans-serif;
+            padding: 1rem;
+            font-family: system-ui;
         }
-        h1 { 
-            color: white; 
-            text-align: center; 
-            margin-bottom: 2rem;
-            font-size: 2.5rem;
-            letter-spacing: 0.3em;
-        }
+        h1 { color: white; text-align: center; margin-bottom: 1rem; letter-spacing: 0.3em; }
+        h2 { color: #666; font-size: 0.8rem; margin: 1rem 0 0.5rem; text-transform: uppercase; }
         
-        .card-row { margin-bottom: 2rem; }
-        .card-row h2 {
-            color: #666;
-            font-size: 0.9rem;
-            margin-bottom: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.2em;
-        }
-        .cards { display: flex; flex-wrap: wrap; gap: 6px; }
+        .card-row { display: flex; flex-wrap: wrap; gap: 3px; margin-bottom: 0.5rem; }
         
         .card {
             width: 48px;
             height: 72px;
-            border-radius: 5px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 4px;
-            box-shadow: 2px 2px 6px rgba(0,0,0,0.4);
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 1px 1px 4px rgba(0,0,0,0.5);
+            transition: transform 0.15s;
             cursor: pointer;
-            transition: transform 0.15s, z-index 0s;
-            position: relative;
-            z-index: 1;
+            background: url('https://raw.githubusercontent.com/eperezcosano/Uno/master/public/images/deck.svg') no-repeat;
+            background-size: 840px 720px; /* 14*60=840, 8*90=720 */
         }
-        .card:hover {
-            transform: scale(1.4) translateY(-15px);
-            z-index: 100;
-        }
+        .card:hover { transform: scale(1.5) translateY(-10px); z-index: 100; }
         
-        .card-face {
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-        }
-        
-        .card-corner {
-            font-size: 10px;
-            font-weight: 800;
-            line-height: 1;
-        }
-        .card-corner.bottom { transform: rotate(180deg); }
-        
-        .card-center {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            font-weight: 800;
-        }
-        
-        /* Colors */
-        .card.red { 
-            background: linear-gradient(145deg, #ff3344, #cc0000); 
-            color: white;
-            border: 1.5px solid #aa0000;
-        }
-        .card.yellow { 
-            background: linear-gradient(145deg, #ffcc00, #ff9900); 
-            color: #442200;
-            border: 1.5px solid #cc7700;
-        }
-        .card.green { 
-            background: linear-gradient(145deg, #00cc66, #009944); 
-            color: white;
-            border: 1.5px solid #007733;
-        }
-        .card.blue { 
-            background: linear-gradient(145deg, #3388ff, #1155cc); 
-            color: white;
-            border: 1.5px solid #004499;
-        }
-        .card.wild { 
-            background: linear-gradient(135deg, #ff00cc, #6600ff, #00ccff, #00ff66);
-            color: white;
-            border: 1.5px solid white;
-            text-shadow: 0 0 3px rgba(0,0,0,0.8);
-        }
-        
-        /* Card back */
         .card-back {
-            background: linear-gradient(145deg, #1a1a2e, #0f0f1a);
-            border: 2px solid #ff3344;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            background: url('https://raw.githubusercontent.com/eperezcosano/Uno/master/public/images/uno.svg') center/cover;
+            background-size: 40px 60px;
         }
-        .card-back .logo {
+        
+        /* Hover tooltip */
+        .card::after {
+            content: attr(data-label);
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
             font-size: 10px;
-            font-weight: 900;
-            color: #ff3344;
-            letter-spacing: 1px;
+            padding: 2px 6px;
+            border-radius: 3px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
         }
-        
-        /* Special cards */
-        .card[data-value="skip"] .card-center::after { content: '⊘'; }
-        .card[data-value="reverse"] .card-center::after { content: '⟲'; font-size: 18px; }
-        .card[data-value="draw2"] .card-center::after { content: '+2'; font-size: 14px; }
-        .card[data-value="wild"] .card-center::after { content: '🌈'; }
-        .card[data-value="wild4"] .card-center::after { content: '+4'; font-size: 14px; }
-        
-        /* Dark text for yellow */
-        .card.yellow .card-center,
-        .card.yellow .card-corner { color: #442200; text-shadow: none; }
+        .card:hover::after { opacity: 1; }
     </style>
 </head>
 <body>
@@ -131,89 +59,65 @@
     <div id="app"></div>
 
     <script>
-        const COLORS = ['red', 'yellow', 'green', 'blue'];
+        const SPRITE_W = 840, SPRITE_H = 720;
+        const CARD_W = 60, CARD_H = 90;
         
-        // Build deck: 1x0, 2x(1-9), 2x(special) per color + 4 wild + 4 wild4
-        function buildDeck() {
-            const deck = [];
-            let id = 0;
-            
-            COLORS.forEach(color => {
-                deck.push({ id: id++, color, value: '0' });
-                for (let v = 1; v <= 9; v++) {
-                    deck.push({ id: id++, color, value: String(v) });
-                    deck.push({ id: id++, color, value: String(v) });
-                }
-                ['skip', 'reverse', 'draw2'].forEach(v => {
-                    deck.push({ id: id++, color, value: v });
-                    deck.push({ id: id++, color, value: v });
+        // Card positions from sprite (col * 60, row * 90)
+        const COLORS = ['red', 'yellow', 'green', 'blue'];
+        const cardData = [];
+        
+        // Build: 8 rows, 13 cards each (0-9, skip, reverse, draw2)
+        const values = ['0','1','2','3','4','5','6','7','8','9','skip','reverse','draw2'];
+        
+        for (let row = 0; row < 8; row++) {
+            const color = COLORS[row % 4];
+            for (let col = 0; col < 13; col++) {
+                cardData.push({
+                    color,
+                    value: values[col],
+                    x: col * CARD_W,
+                    y: row * CARD_H
                 });
-            });
-            
-            for (let i = 0; i < 4; i++) deck.push({ id: id++, color: 'wild', value: 'wild' });
-            for (let i = 0; i < 4; i++) deck.push({ id: id++, color: 'wild', value: 'wild4' });
-            
-            return deck;
+            }
         }
         
-        function renderCard(card) {
+        // Add wilds (these are at row 7, cols 13-14 in the actual sprite but we have 4 each)
+        for (let i = 0; i < 4; i++) {
+            cardData.push({ color: 'wild', value: 'wild', x: 13 * CARD_W, y: 7 * CARD_H });
+        }
+        for (let i = 0; i < 4; i++) {
+            cardData.push({ color: 'wild', value: 'wild4', x: 14 * CARD_W, y: 7 * CARD_H });
+        }
+        
+        function renderCard(card, index) {
             const div = document.createElement('div');
-            div.className = `card ${card.color}`;
-            div.dataset.value = card.value;
-            
-            const display = card.value === 'wild' ? '🌈' : card.value === 'wild4' ? '+4' : card.value;
-            const cornerDisplay = ['skip','reverse','draw2'].includes(card.value) 
-                ? (card.value === 'skip' ? '⊘' : card.value === 'reverse' ? '⟲' : '+2')
-                : display;
-            
-            div.innerHTML = `
-                <div class="card-face">
-                    <div class="card-corner">${cornerDisplay}</div>
-                    <div class="card-center"></div>
-                    <div class="card-corner bottom">${cornerDisplay}</div>
-                </div>
-            `;
+            div.className = 'card';
+            div.style.backgroundPosition = `-${card.x}px -${card.y}px`;
+            div.dataset.label = `${card.color} ${card.value}`;
             return div;
         }
         
         function render() {
-            const deck = buildDeck();
             const app = document.getElementById('app');
             
-            // Card back
-            let html = `<div class="card-row"><h2>Back</h2><div class="cards"><div class="card card-back"><div class="logo">UNO</div></div></div></div>`;
+            let html = `<h2>Back</h2><div class="card-row"><div class="card card-back"></div></div>`;
             
-            // By color
             COLORS.forEach(color => {
-                const cards = deck.filter(c => c.color === color);
-                html += `<div class="card-row"><h2>${color}</h2><div class="cards">`;
+                const cards = cardData.filter(c => c.color === color);
+                html += `<h2>${color}</h2><div class="card-row">`;
                 cards.forEach(c => {
-                    const display = c.value === 'skip' ? '⊘' : c.value === 'reverse' ? '⟲' : c.value === 'draw2' ? '+2' : c.value;
-                    html += `<div class="card ${c.color}" data-value="${c.value}">
-                        <div class="card-face">
-                            <div class="card-corner">${display}</div>
-                            <div class="card-center"></div>
-                            <div class="card-corner bottom">${display}</div>
-                        </div>
-                    </div>`;
+                    html += `<div class="card" style="background-position: -${c.x}px -${c.y}px" data-label="${c.color} ${c.value}"></div>`;
                 });
-                html += `</div></div>`;
+                html += `</div>`;
             });
             
-            // Wild
-            const wilds = deck.filter(c => c.color === 'wild');
-            html += `<div class="card-row"><h2>Wild</h2><div class="cards">`;
+            // Wilds
+            const wilds = cardData.filter(c => c.color === 'wild');
+            html += `<h2>wild</h2><div class="card-row">`;
             wilds.forEach(c => {
-                const display = c.value === 'wild' ? '🌈' : '+4';
-                html += `<div class="card ${c.color}" data-value="${c.value}">
-                    <div class="card-face">
-                        <div class="card-corner">${display}</div>
-                        <div class="card-center"></div>
-                        <div class="card-corner bottom">${display}</div>
-                    </div>
-                </div>`;
+                html += `<div class="card" style="background-position: -${c.x}px -${c.y}px" data-label="${c.value}"></div>`;
             });
-            html += `</div></div>`;
+            html += `</div>`;
             
             app.innerHTML = html;
         }
